@@ -112,22 +112,21 @@ header {
   color: var(--accent);
 }
 
-.navBar a::after {
-  content: '';
+/* Animated nav underline indicator */
+.nav-underline {
   position: absolute;
-  bottom: -6px;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: var(--accent);
-  transition: all 0.3s;
-  box-shadow: 0 0 8px var(--accent);
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius: 2px;
+  box-shadow: 0 0 10px var(--accent), 0 0 4px var(--accent);
 }
 
-.navBar a:hover::after,
-.navBar a.active_::after {
-  width: 100%;
-  left: 0;
+.navBar a {
+  position: relative;
+  padding: 8px 4px;
 }
 
 .port-btn {
