@@ -4,7 +4,7 @@
    ========================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
-
+* { cursor: none !important; }
 /* ---------- ROOT TOKENS ---------- */
 :root {
   --bg-1: #050422;
