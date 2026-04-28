@@ -1,6 +1,33 @@
 import About from "../models/aboutModel.js";
 import { deleteImageFile } from "../utils/deleteImg.js";
 
+// Helper: Build full URL from relative path
+const buildUrl = (relativePath) => {
+  if (!relativePath) return "";
+  // If it's already a full URL (legacy data), return as-is
+  if (relativePath.startsWith("http")) return relativePath;
+  return `${process.env.BASE_URL}/${relativePath}`;
+};
+
+// Helper: Strip BASE_URL prefix to get relative path (handles legacy data)
+const toRelativePath = (urlOrPath) => {
+  if (!urlOrPath) return "";
+  // Strip any http://localhost:xxxx or https://xxx.onrender.com prefix
+  return urlOrPath.replace(/^https?:\/\/[^/]+\//, "");
+};
+
+// Format about doc for response — converts relative paths to full URLs
+const formatAboutResponse = (about) => {
+  const obj = about.toObject ? about.toObject() : about;
+  return {
+    ...obj,
+    services: obj.services?.map((s) => ({
+      ...s,
+      icon: buildUrl(toRelativePath(s.icon)),
+    })) || [],
+  };
+};
+
 export const saveAbout = async (req, res, next) => {
   try {
     const { heading, description, services, stats } = req.body;
@@ -19,13 +46,14 @@ export const saveAbout = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid JSON for services/stats", error });
     }
 
-
     let about = await About.findOne();
 
     if (!about) {
+      // First-time creation
       parsedServices.forEach((service, index) => {
         if (req.files && req.files[index]) {
-          service.icon = `${process.env.BASE_URL}/uploads/images/${req.files[index].filename}`;
+          // Save ONLY relative path
+          service.icon = `uploads/images/${req.files[index].filename}`;
         }
       });
 
@@ -36,36 +64,39 @@ export const saveAbout = async (req, res, next) => {
         stats: parsedStats,
       });
       await about.save();
-      return res.status(201).json(about);
+      return res.status(201).json(formatAboutResponse(about));
     } else {
-
+      // Update existing — handle deletions of removed services
       about.services.forEach((oldService) => {
         const stillExists = parsedServices.some(
           (s) => s._id && s._id.toString() === oldService._id.toString()
         );
         if (!stillExists && oldService.icon) {
-          deleteImageFile(oldService.icon);
+          // Convert any legacy full-URL to relative path before deleting file
+          deleteImageFile(toRelativePath(oldService.icon));
         }
       });
 
       const updatedServices = parsedServices.map((service, index) => {
         const oldService = about.services.find(
-          s => s._id && s._id.toString() === service._id
+          (s) => s._id && s._id.toString() === service._id
         );
 
-        const uploadedFile = req.files?.find(f => f.fieldname === `icons_${index}`);
+        const uploadedFile = req.files?.find((f) => f.fieldname === `icons_${index}`);
 
         if (uploadedFile) {
-          if (oldService?.icon) deleteImageFile(oldService.icon);
+          if (oldService?.icon) deleteImageFile(toRelativePath(oldService.icon));
           return {
             ...service,
-            icon: `${process.env.BASE_URL}/uploads/images/${uploadedFile.filename}`,
+            // Save ONLY relative path
+            icon: `uploads/images/${uploadedFile.filename}`,
           };
         }
 
+        // No new file — keep existing icon (normalized to relative path)
         return {
           ...service,
-          icon: oldService?.icon || service.icon || "",
+          icon: toRelativePath(oldService?.icon || service.icon || ""),
         };
       });
 
@@ -75,7 +106,7 @@ export const saveAbout = async (req, res, next) => {
       about.stats = parsedStats;
 
       await about.save();
-      return res.status(200).json(about);
+      return res.status(200).json(formatAboutResponse(about));
     }
   } catch (error) {
     next(error);
@@ -87,12 +118,11 @@ export const getAbout = async (req, res, next) => {
     const about = await About.findOne();
     if (!about) return res.status(404).json({ message: "About section not found" });
 
-    res.status(200).json(about);
+    res.status(200).json(formatAboutResponse(about));
   } catch (error) {
     next(error);
   }
 };
-
 
 export const deleteAboutStat = async (req, res, next) => {
   try {
@@ -100,7 +130,7 @@ export const deleteAboutStat = async (req, res, next) => {
     const about = await About.findOne();
     if (!about) return res.status(404).json({ message: "About not found" });
 
-    about.stats = about.stats.filter(stat => stat._id.toString() !== id);
+    about.stats = about.stats.filter((stat) => stat._id.toString() !== id);
     await about.save();
 
     res.status(200).json({ message: "Stat removed" });
@@ -109,31 +139,26 @@ export const deleteAboutStat = async (req, res, next) => {
   }
 };
 
-
-
 export const deleteAboutService = async (req, res, next) => {
   try {
     const { id } = req.params;
-    console.log("Deleting service ID:", id);
 
     const about = await About.findOne();
     if (!about) {
       return res.status(404).json({ message: "About not found" });
     }
 
-
-    const serviceExists = about.services.some(
-      (service) => service._id.toString() === id
-    );
-    if (!serviceExists) {
+    const service = about.services.find((s) => s._id.toString() === id);
+    if (!service) {
       return res.status(404).json({ message: "Service not found" });
     }
 
+    // Delete the icon file if it exists
+    if (service.icon) {
+      deleteImageFile(toRelativePath(service.icon));
+    }
 
-    about.services = about.services.filter(
-      (service) => service._id.toString() !== id
-    );
-
+    about.services = about.services.filter((s) => s._id.toString() !== id);
     await about.save();
 
     res.json({
@@ -144,4 +169,3 @@ export const deleteAboutService = async (req, res, next) => {
     next(error);
   }
 };
-

@@ -1,8 +1,29 @@
 import Hero from "../models/heroModel.js";
-import { deleteImageFile } from '../utils/deleteImg.js'; 
+import { deleteImageFile } from "../utils/deleteImg.js";
 import fs from "fs";
 import path from "path";
 
+// Helper: Build full URL from relative path
+const buildUrl = (relativePath) => {
+  if (!relativePath) return "";
+  if (relativePath.startsWith("http")) return relativePath;
+  return `${process.env.BASE_URL}/${relativePath}`;
+};
+
+// Helper: Strip any host prefix to get relative path
+const toRelativePath = (urlOrPath) => {
+  if (!urlOrPath) return "";
+  return urlOrPath.replace(/^https?:\/\/[^/]+\//, "");
+};
+
+const formatHeroResponse = (hero) => ({
+  id: hero._id,
+  heading: hero.heading,
+  subheading: hero.subheading,
+  description: hero.description,
+  backgroundImageUrl: buildUrl(toRelativePath(hero.backgroundImage)),
+  rightImageUrl: buildUrl(toRelativePath(hero.rightImage)),
+});
 
 export const saveHero = async (req, res, next) => {
   try {
@@ -22,52 +43,41 @@ export const saveHero = async (req, res, next) => {
     if (description) hero.description = description;
 
     if (bgImage) {
-      if (hero.backgroundImage && fs.existsSync(hero.backgroundImage)) {
-        fs.unlinkSync(hero.backgroundImage); 
+      if (hero.backgroundImage) {
+        const relativeOld = toRelativePath(hero.backgroundImage);
+        if (fs.existsSync(relativeOld)) fs.unlinkSync(relativeOld);
       }
-      hero.backgroundImage = path.relative(process.cwd(), bgImage.path).replace(/\\/g, "/");
+      hero.backgroundImage = path
+        .relative(process.cwd(), bgImage.path)
+        .replace(/\\/g, "/");
     }
 
     if (rightImg) {
-      if (hero.rightImage && fs.existsSync(hero.rightImage)) {
-        fs.unlinkSync(hero.rightImage); 
+      if (hero.rightImage) {
+        const relativeOld = toRelativePath(hero.rightImage);
+        if (fs.existsSync(relativeOld)) fs.unlinkSync(relativeOld);
       }
-      hero.rightImage = path.relative(process.cwd(), rightImg.path).replace(/\\/g, "/");
+      hero.rightImage = path
+        .relative(process.cwd(), rightImg.path)
+        .replace(/\\/g, "/");
     }
 
     await hero.save();
-
-    res.json({
-      id: hero._id,
-      heading: hero.heading,
-      subheading: hero.subheading,
-      description: hero.description,
-      backgroundImageUrl: hero.backgroundImage ? `${process.env.BASE_URL}/${hero.backgroundImage}` : "",
-      rightImageUrl: hero.rightImage ? `${process.env.BASE_URL}/${hero.rightImage}` : "",
-    });
+    res.json(formatHeroResponse(hero));
   } catch (error) {
     next(error);
   }
 };
 
-
-export const getHero = async (req, res,next) => {
+export const getHero = async (req, res, next) => {
   try {
     const hero = await Hero.findOne();
     if (!hero) {
       return res.status(404).json({ message: "Hero section not found" });
     }
-
-    res.json({
-      id: hero._id,
-      heading: hero.heading,
-      subheading: hero.subheading,
-      description: hero.description,
-      backgroundImageUrl: `${process.env.BASE_URL}/${hero.backgroundImage}`,
-      rightImageUrl: `${process.env.BASE_URL}/${hero.rightImage}`,
-    });
+    res.json(formatHeroResponse(hero));
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
@@ -85,7 +95,7 @@ export const deleteHeroImage = async (req, res, next) => {
       return res.status(404).json({ message: "No image to delete." });
     }
 
-    deleteImageFile(hero[field]);
+    deleteImageFile(toRelativePath(hero[field]));
 
     hero[field] = "";
     await hero.save();
@@ -96,5 +106,3 @@ export const deleteHeroImage = async (req, res, next) => {
     next(error);
   }
 };
-
-
