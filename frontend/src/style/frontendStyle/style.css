@@ -153,6 +153,50 @@ header {
 
 .vw-btn { color: #000; }
 
+/* =========================================
+   ADD/REPLACE THESE STYLES IN YOUR style.css
+   Find the existing .navBar block and replace it
+   ========================================= */
+
+.navBar {
+  display: flex;
+  gap: 28px;
+  position: relative;
+}
+
+.navBar a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  position: relative;
+  padding: 8px 4px;
+  transition: color 0.3s;
+  display: inline-block;
+}
+
+.navBar a:hover {
+  color: var(--accent);
+}
+
+.navBar a.active_ {
+  color: var(--accent);
+}
+
+/* DELETE the old ::after rule that creates the underline.
+   We're using a motion.span instead now. */
+
+/* Animated underline indicator */
+.nav-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius: 2px;
+  box-shadow: 0 0 10px var(--accent), 0 0 4px var(--accent);
+}
 /* ============= HERO ============= */
 .hero-sec {
   min-height: 100vh;
@@ -161,7 +205,7 @@ header {
 }
 
 .hero-row {
-  max-width: 1320px;
+ 
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -713,7 +757,7 @@ footer p {
 }
 
 .hero-row {
-  max-width: 1200px;
+  max-width: 1320px;
   width: 100%;
   margin: 0 auto;
   display: grid;

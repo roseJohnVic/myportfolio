@@ -2,15 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { getSkills } from "../api/axios";
 import { motion } from "framer-motion";
 
-/* ============================================================
-   Note: I don't have your original Skills.jsx, so this matches your
-   existing API call pattern (getSkills) and uses your existing CSS
-   classes (skill-sec, skill-grid, skill-item).
-   If your original used different classnames, just rename them in
-   the JSX below — the styles in style.css cover both .skill-grid
-   and .skill-row.
-   ============================================================ */
-
 // 3D tilt wrapper
 function TiltCard({ children, className }) {
   const ref = useRef(null);
@@ -68,6 +59,7 @@ export default function UserSkills() {
   return (
     <motion.section
       className="skill-sec"
+      id="skills"
       initial={{ opacity: 0, y: -80 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1, ease: "easeIn" }}
@@ -101,10 +93,10 @@ export default function UserSkills() {
           viewport={{ once: false, amount: 0.2 }}
           variants={fadeInUp}
         >
-          {skillData.skills?.map((skill, i) => (
-            <TiltCard key={i} className="skill-item">
-              {skill.icon && <img src={skill.icon} alt={skill.title || skill.name} />}
-              <strong>{skill.title || skill.name}</strong>
+          {skillData.skillsCnt?.map((skill, i) => (
+            <TiltCard key={skill._id || i} className="skill-item">
+              {skill.icon && <img src={skill.icon} alt={skill.title} />}
+              <strong>{skill.title}</strong>
             </TiltCard>
           ))}
         </motion.div>

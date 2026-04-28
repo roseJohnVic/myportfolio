@@ -12,28 +12,19 @@ export default function Header({ logo, links }) {
 
   // ===== SCROLL SPY LOGIC =====
   useEffect(() => {
-    // Only run scroll-spy on the home page
     if (location.pathname !== "/") return;
 
-    // Map nav link hrefs to section IDs
-    // links come as [{ href: "/#home", label: "Home" }, ...] or similar
-    // We extract the section ID from the href
     const getSectionId = (href) => {
       if (!href) return null;
-      // Handle hrefs like "/#home", "#home", "/home"
       const match = href.match(/#([\w-]+)/);
       return match ? match[1] : null;
     };
 
-    const sectionIds = links
-      .map((l) => getSectionId(l.href))
-      .filter(Boolean);
-
+    const sectionIds = links.map((l) => getSectionId(l.href)).filter(Boolean);
     if (sectionIds.length === 0) return;
 
     const handleScroll = () => {
-      const scrollPos = window.scrollY + 200; // offset for navbar height
-
+      const scrollPos = window.scrollY + 200;
       let current = sectionIds[0];
       for (const id of sectionIds) {
         const el = document.getElementById(id);
@@ -49,7 +40,7 @@ export default function Header({ logo, links }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [location.pathname, links]);
 
-  // Smooth scroll click handler
+  // Smooth scroll click
   const handleNavClick = (e, href) => {
     const match = href?.match(/#([\w-]+)/);
     if (match) {
@@ -94,6 +85,18 @@ export default function Header({ logo, links }) {
                     className={isActive ? "active_" : ""}
                   >
                     {link.label}
+                    {/* Animated underline indicator */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="navIndicator"
+                        className="nav-underline"
+                        transition={{
+                          type: "spring",
+                          stiffness: 350,
+                          damping: 30,
+                        }}
+                      />
+                    )}
                   </a>
                 );
               })}
