@@ -1,26 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
-import { motion, useAnimation } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { getHero } from "../api/axios";
 
 export default function UserHero() {
   const [hero, setHero] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  const mainImgRef = useRef(null);
-  const imgControls = useAnimation();
-  const textControls = useAnimation();
-  const stuckRef = useRef(false);
-  const rafRef = useRef(null);
-
-  const fadeInVariant = {
-    hidden: { opacity: 0, y: 60 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: "easeOut" }
-    }
-  };
 
   useEffect(() => {
     async function fetchHero() {
@@ -37,209 +22,114 @@ export default function UserHero() {
     fetchHero();
   }, []);
 
-  useEffect(() => {
-    function checkSticky() {
-      const el = mainImgRef.current;
-      if (!el) return;
-
-      const header = document.querySelector("header");
-      const headerHeight = header ? header.getBoundingClientRect().height : 0;
-      const topFromStyle = parseFloat(getComputedStyle(el).top) || 0;
-      const threshold = headerHeight + topFromStyle + 1;
-      const rect = el.getBoundingClientRect();
-      const isStuckNow = rect.top <= threshold;
-
-      if (isStuckNow && !stuckRef.current) {
-        stuckRef.current = true;
-        imgControls.start({
-          width: "100%",
-          borderRadius: "0px",
-          transition: { duration: 1.1, ease: "easeOut" },
-        });
-        textControls.start({
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.9, delay: 0.2, ease: "easeOut" },
-        });
-      } else if (!isStuckNow && stuckRef.current) {
-        stuckRef.current = false;
-        imgControls.start({
-          width: "80%",
-          borderRadius: "500px",
-          transition: { duration: 0.45, ease: "easeInOut" },
-        });
-        textControls.start({
-          opacity: 0,
-          y: 80,
-          transition: { duration: 0.3, ease: "easeInOut" },
-        });
-      }
-    }
-
-    function onScroll() {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(checkSticky);
-    }
-
-    checkSticky();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [imgControls, textControls]);
-
-  useEffect(() => {
-    const el = mainImgRef.current;
-    if (!el) return;
-
-    let node = el.parentElement;
-    while (node && node !== document.body) {
-      const style = getComputedStyle(node);
-      if (/(hidden|auto|scroll)/.test(style.overflowY) || style.transform !== "none") {
-        console.warn(
-          "[UserHero] ancestor may block sticky behaviour:",
-          node,
-          "overflowY:",
-          style.overflowY,
-          "transform:",
-          style.transform
-        );
-        break;
-      }
-      node = node.parentElement;
-    }
-  }, []);
-
-  if (loading) return <p>Loading hero section...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <p style={{ padding: "120px 20px", textAlign: "center" }}>Loading hero section...</p>;
+  if (error) return <p style={{ padding: "120px 20px", textAlign: "center" }}>{error}</p>;
   if (!hero) return null;
+
+  const fadeUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: (delay = 0) => ({
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, delay, ease: "easeOut" },
+    }),
+  };
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: -80 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1, ease: "easeIn" }}
+      id="home"
       className="hero-sec"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1 }}
     >
       <div className="hero-row">
+        {/* LEFT: Text content */}
         <motion.div
-          className="top"
+          className="hero-text"
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, amount: 0.3 }}
-          variants={fadeInVariant}
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.15 } },
+          }}
         >
-          <h1>
+          <motion.div className="hero-badge" variants={fadeUp}>
+            <span className="dot"></span>
+            Available for freelance
+          </motion.div>
+
+          <motion.h1 variants={fadeUp}>
             {hero.heading} <span>Roselin</span>
-          </h1>
-          <strong>{hero.subheading}</strong>
-          <p>{hero.description}</p>
-        </motion.div>
+          </motion.h1>
 
-        {/* ============================================================
-            ORIGINAL VERSION — your sticky scroll-morph image (kept commented)
-            ============================================================
-        <motion.div
-          ref={mainImgRef}
-          className="main-img"
-          initial={{ width: "80%", borderRadius: "500px" }}
-          animate={imgControls}
-          style={{
-            height: "100vh",
-            margin: "0 auto",
-            position: "sticky",
-            top: 0,
-            bottom: 0,
-            overflow: "hidden",
-          }}
-        >
-          <img
-            src={hero.backgroundImageUrl}
-            alt="Background"
-            style={{
-              borderRadius: "inherit",
-              width: "100%",
-              height: "inherit",
-              objectFit: "cover",
-              display: "block",
-            }}
-          />
+          <motion.strong variants={fadeUp}>{hero.subheading}</motion.strong>
 
-          <motion.div
-            className="top top-inner"
-            initial={{ opacity: 0, y: 80 }}
-            animate={textControls}
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "43%",
-              transform: "translate(-50%, -50%)",
-              textAlign: "center",
-              color: "#fff",
-            }}
-          >
-            <h1>
-              {hero.heading} <span>Roselin</span>
-            </h1>
-            <strong>{hero.subheading}</strong>
-            <p>{hero.description}</p>
+          <motion.p variants={fadeUp}>{hero.description}</motion.p>
+
+          <motion.div className="hero-cta" variants={fadeUp}>
+            <a href="#projects" className="btn-primary">
+              <span>🚀</span> View My Work
+            </a>
+            <a href="#contact" className="btn-ghost">
+              <span>✉</span> Get In Touch
+            </a>
+          </motion.div>
+
+          <motion.div className="hero-socials" variants={fadeUp}>
+            <a href="#" aria-label="GitHub" className="social-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+              </svg>
+            </a>
+            <a href="#" aria-label="LinkedIn" className="social-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg>
+            </a>
+            <a href="mailto:#" aria-label="Email" className="social-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" />
+              </svg>
+            </a>
           </motion.div>
         </motion.div>
-        ============================================================ */}
 
-        {/* ===== UPGRADED VERSION (blue theme) — same sticky behavior, prettier styling ===== */}
+        {/* RIGHT: Image */}
         <motion.div
-          ref={mainImgRef}
-          className="main-img"
-          initial={{ width: "80%", borderRadius: "500px" }}
-          animate={imgControls}
-          style={{
-            height: "100vh",
-            margin: "0 auto",
-            position: "sticky",
-            top: 0,
-            bottom: 0,
-            overflow: "hidden",
-          }}
+          className="hero-image-wrap"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
         >
-          <img
-            src={hero.backgroundImageUrl}
-            alt="Background"
-            style={{
-              borderRadius: "inherit",
-              width: "100%",
-              height: "inherit",
-              objectFit: "cover",
-              display: "block",
-            }}
-          />
+          <div className="hero-image-blob">
+            <img src={hero.backgroundImageUrl} alt="Roselin" />
+          </div>
 
-          <motion.div
-            className="top top-inner"
-            initial={{ opacity: 0, y: 80 }}
-            animate={textControls}
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              textAlign: "center",
-              color: "#fff",
-              width: "90%",
-            }}
-          >
-            <h1>
-              {hero.heading} <span>Roselin</span>
-            </h1>
-            <strong>{hero.subheading}</strong>
-            <p>{hero.description}</p>
-          </motion.div>
+          {/* Floating tech badges */}
+          <div className="floating-badge badge-1">
+            <span>⚛</span> React
+          </div>
+          <div className="floating-badge badge-2">
+            <span>🟢</span> Node.js
+          </div>
+          <div className="floating-badge badge-3">
+            <span>🍃</span> MongoDB
+          </div>
         </motion.div>
       </div>
+
+      {/* Scroll down indicator */}
+      <motion.a
+        href="#about"
+        className="scroll-indicator"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5, duration: 0.6 }}
+      >
+        <span>Scroll</span>
+        <div className="scroll-arrow"></div>
+      </motion.a>
     </motion.section>
   );
 }
