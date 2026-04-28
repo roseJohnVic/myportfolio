@@ -9,7 +9,7 @@ import UserSkills from "./frontComponents/Skills";
 import UserProjects from "./frontComponents/Project";
 import UserContact from "./frontComponents/Contact";
 import ScrollToTop from "./frontComponents/ScrollToTop";
-import CursorEffect from "./components/CursorEffect";
+import CursorEffect from "./frontComponents/CursorEffect"; 
 
 function App() {
   return (
