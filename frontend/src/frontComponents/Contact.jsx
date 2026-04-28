@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { saveUsers } from "../api/axios";
-import { animate, motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function UserContact() {
@@ -15,6 +15,7 @@ export default function UserContact() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const validateForm = () => {
     const nameRegex = /^[A-Za-z\s]+$/;
     const phoneRegex = /^\d{10}$/;
@@ -48,7 +49,7 @@ export default function UserContact() {
       toast.success("Message saved successfully!");
       setFormData({ name: "", phone: "", email: "", address: "", message: "" });
     } catch {
-      alert("Error saving contact");
+      toast.error("Error saving contact");
     }
   };
 
@@ -57,50 +58,78 @@ export default function UserContact() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut"
-      }
-    }
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
   };
 
   return (
-    <motion.section className="cnt-sec" initial={{ opacity: 0, y: -80 }}
+    <motion.section
+      className="cnt-sec"
+      initial={{ opacity: 0, y: -80 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1, ease: "easeIn" }}
-      style={{
-        width: '100%',
-
-        textAlign: 'center',
-      }}>
-      <motion.div className="cont-form" initial="hidden"
-      animate={{ opacity: 1}}
+      style={{ width: "100%", textAlign: "center" }}
+    >
+      <motion.div
+        className="cont-form"
+        initial="hidden"
+        animate={{ opacity: 1 }}
         whileInView="visible"
         viewport={{ once: false, amount: 0.3 }}
-        variants={fadeInVariant}>
+        variants={fadeInVariant}
+      >
         <div className="container">
-          <h5>Contact </h5>
-          <form onSubmit={handleSubmit}  >
+          <h5>Contact</h5>
+          <form onSubmit={handleSubmit}>
             <div className="dbl">
-              <input name="name" placeholder="Your name" value={formData.name} onChange={handleChange} />
-              <input name="phone" placeholder="Your phone" value={formData.phone} onChange={handleChange} />
+              <input
+                name="name"
+                placeholder="Your name"
+                value={formData.name}
+                onChange={handleChange}
+              />
+              <input
+                name="phone"
+                placeholder="Your phone"
+                value={formData.phone}
+                onChange={handleChange}
+              />
             </div>
             <div className="dbl">
-              <input name="email" placeholder="Your email" value={formData.email} onChange={handleChange} />
-              <input name="address" placeholder="Your address" value={formData.address} onChange={handleChange} />
+              <input
+                name="email"
+                placeholder="Your email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+              <input
+                name="address"
+                placeholder="Your address"
+                value={formData.address}
+                onChange={handleChange}
+              />
             </div>
-            <textarea name="message" placeholder="Your message" value={formData.message} onChange={handleChange} />
-            <button type="submit" className="port-btn">Send</button>
+            <textarea
+              name="message"
+              placeholder="Your message"
+              value={formData.message}
+              onChange={handleChange}
+            />
+            <button type="submit" className="port-btn">
+              Send
+            </button>
           </form>
         </div>
       </motion.div>
-      <ToastContainer position="top-center"
+      <ToastContainer
+        position="top-center"
         autoClose={1000}
         hideProgressBar={false}
         closeOnClick
         pauseOnHover={false}
         draggable
-        theme="dark" />
+        theme="dark"
+      />
     </motion.section>
   );
 }

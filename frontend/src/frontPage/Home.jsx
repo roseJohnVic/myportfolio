@@ -1,26 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Hero from "../frontComponents/Hero";
 import UserAbout from "../frontComponents/About";
 import UserSkills from "../frontComponents/Skills";
 import UserProjects from "../frontComponents/Project";
 import UserContact from "../frontComponents/Contact";
 import Footer from "../frontComponents/Footer";
-import '../style/frontendStyle/style.css'
+import ParticlesBg from "../frontComponents/ParticlesBg";
+import ScrollTop from "../frontComponents/ScrollTop";
+import "../style/frontendStyle/style.css";
 
+export const Home = () => {
+  return (
+    <div className="maincontent">
+      {/* Animated particle background — sits behind everything */}
+      <ParticlesBg />
 
+      <Hero />
+      <UserAbout />
+      <UserSkills />
+      <UserProjects />
+      <UserContact />
+      <Footer />
 
-export const Home =()=>{
-
-
-    return(
-       <div className="maincontent">
-         <Hero/>
-         <UserAbout/>
-         <UserSkills/>
-         <UserProjects/>
-         <UserContact/>
-         <Footer/>
-       </div>
-       
-    )
-}
+      {/* Floating scroll-to-top button */}
+      <ScrollTop />
+    </div>
+  );
+};

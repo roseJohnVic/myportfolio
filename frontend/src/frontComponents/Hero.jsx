@@ -12,17 +12,16 @@ export default function UserHero() {
   const textControls = useAnimation();
   const stuckRef = useRef(false);
   const rafRef = useRef(null);
+
   const fadeInVariant = {
     hidden: { opacity: 0, y: 60 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut"
-      }
+      transition: { duration: 0.8, ease: "easeOut" }
     }
   };
+
   useEffect(() => {
     async function fetchHero() {
       try {
@@ -45,17 +44,13 @@ export default function UserHero() {
 
       const header = document.querySelector("header");
       const headerHeight = header ? header.getBoundingClientRect().height : 0;
-
       const topFromStyle = parseFloat(getComputedStyle(el).top) || 0;
-
       const threshold = headerHeight + topFromStyle + 1;
-
       const rect = el.getBoundingClientRect();
       const isStuckNow = rect.top <= threshold;
 
       if (isStuckNow && !stuckRef.current) {
         stuckRef.current = true;
-
         imgControls.start({
           width: "100%",
           borderRadius: "0px",
@@ -67,7 +62,6 @@ export default function UserHero() {
           transition: { duration: 0.9, delay: 0.2, ease: "easeOut" },
         });
       } else if (!isStuckNow && stuckRef.current) {
-
         stuckRef.current = false;
         imgControls.start({
           width: "80%",
@@ -88,7 +82,6 @@ export default function UserHero() {
     }
 
     checkSticky();
-
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
 
@@ -98,7 +91,6 @@ export default function UserHero() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [imgControls, textControls]);
-
 
   useEffect(() => {
     const el = mainImgRef.current;
@@ -127,14 +119,20 @@ export default function UserHero() {
   if (!hero) return null;
 
   return (
-    <motion.section initial={{ opacity: 0, y: -80 }}
+    <motion.section
+      initial={{ opacity: 0, y: -80 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1, ease: "easeIn" }} className="hero-sec" >
-      <div className="hero-row" >
-        <motion.div className="top" initial="hidden"
+      transition={{ duration: 1, ease: "easeIn" }}
+      className="hero-sec"
+    >
+      <div className="hero-row">
+        <motion.div
+          className="top"
+          initial="hidden"
           whileInView="visible"
           viewport={{ once: false, amount: 0.3 }}
-          variants={fadeInVariant}>
+          variants={fadeInVariant}
+        >
           <h1>
             {hero.heading} <span>Roselin</span>
           </h1>
@@ -142,6 +140,9 @@ export default function UserHero() {
           <p>{hero.description}</p>
         </motion.div>
 
+        {/* ============================================================
+            ORIGINAL VERSION — your sticky scroll-morph image (kept commented)
+            ============================================================
         <motion.div
           ref={mainImgRef}
           className="main-img"
@@ -152,7 +153,7 @@ export default function UserHero() {
             margin: "0 auto",
             position: "sticky",
             top: 0,
-            bottom:0,
+            bottom: 0,
             overflow: "hidden",
           }}
         >
@@ -179,6 +180,56 @@ export default function UserHero() {
               transform: "translate(-50%, -50%)",
               textAlign: "center",
               color: "#fff",
+            }}
+          >
+            <h1>
+              {hero.heading} <span>Roselin</span>
+            </h1>
+            <strong>{hero.subheading}</strong>
+            <p>{hero.description}</p>
+          </motion.div>
+        </motion.div>
+        ============================================================ */}
+
+        {/* ===== UPGRADED VERSION (blue theme) — same sticky behavior, prettier styling ===== */}
+        <motion.div
+          ref={mainImgRef}
+          className="main-img"
+          initial={{ width: "80%", borderRadius: "500px" }}
+          animate={imgControls}
+          style={{
+            height: "100vh",
+            margin: "0 auto",
+            position: "sticky",
+            top: 0,
+            bottom: 0,
+            overflow: "hidden",
+          }}
+        >
+          <img
+            src={hero.backgroundImageUrl}
+            alt="Background"
+            style={{
+              borderRadius: "inherit",
+              width: "100%",
+              height: "inherit",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+
+          <motion.div
+            className="top top-inner"
+            initial={{ opacity: 0, y: 80 }}
+            animate={textControls}
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              textAlign: "center",
+              color: "#fff",
+              width: "90%",
             }}
           >
             <h1>

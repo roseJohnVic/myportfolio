@@ -5,17 +5,16 @@ import { motion } from "framer-motion";
 export default function Header({ logo, links }) {
   const location = useLocation();
 
-  // Create a class name based on the current route
-  // For example, for "/about" it'll be "page-about", for "/" it'll be "page-home"
-  // You can customize this logic to suit your needs
-  const currentPageClass = `page-${location.pathname === "/" ? "home" : location.pathname.substring(1)}`;
+  const currentPageClass = `page-${
+    location.pathname === "/" ? "home" : location.pathname.substring(1)
+  }`;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: -80 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1, ease: "easeIn" }}
-      className={currentPageClass} // Add dynamic class here
+      className={currentPageClass}
     >
       <header>
         <div className="hd-row">

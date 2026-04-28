@@ -1,9 +1,43 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getSkills } from "../api/axios";
 import { motion } from "framer-motion";
 
+/* ============================================================
+   Note: I don't have your original Skills.jsx, so this matches your
+   existing API call pattern (getSkills) and uses your existing CSS
+   classes (skill-sec, skill-grid, skill-item).
+   If your original used different classnames, just rename them in
+   the JSX below — the styles in style.css cover both .skill-grid
+   and .skill-row.
+   ============================================================ */
+
+// 3D tilt wrapper
+function TiltCard({ children, className }) {
+  const ref = useRef(null);
+  const onMove = (e) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rx = ((y - rect.height / 2) / rect.height) * -10;
+    const ry = ((x - rect.width / 2) / rect.width) * 10;
+    el.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+  };
+  const onLeave = () => {
+    if (ref.current)
+      ref.current.style.transform =
+        "perspective(900px) rotateX(0) rotateY(0) translateY(0)";
+  };
+  return (
+    <div ref={ref} className={className} onMouseMove={onMove} onMouseLeave={onLeave}>
+      {children}
+    </div>
+  );
+}
+
 export default function UserSkills() {
-  const [skillsData, setSkillsData] = useState(null);
+  const [skillData, setSkillData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -11,11 +45,8 @@ export default function UserSkills() {
     async function fetchSkills() {
       try {
         const data = await getSkills();
-        if (data) {
-          setSkillsData(data);
-        } else {
-          setError("Skills not found.");
-        }
+        if (data) setSkillData(data);
+        else setError("Skills not found.");
       } catch (err) {
         setError("Failed to load skills.");
       } finally {
@@ -27,79 +58,57 @@ export default function UserSkills() {
 
   if (loading) return <p>Loading skills...</p>;
   if (error) return <p>{error}</p>;
-  if (!skillsData) return null;
+  if (!skillData) return null;
 
-  const fadeInVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut",
-      },
-    },
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 100 },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    rotate: -2,
-    transition: {
-      delay: i * 0.1,
-      type: "spring",
-      bounce: 0.3,
-      duration: 0.8,
-    },
-  }),
-};
-
   return (
-      <motion.section className="skills-sec"   initial={{ opacity: 0, x: 200 }}
-      animate={{ opacity: 1, x: 0 }}
+    <motion.section
+      className="skill-sec"
+      initial={{ opacity: 0, y: -80 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1, ease: "easeIn" }}
-      style={{
-        width: "100%",
-        textAlign: "center",
-      }}>
-        <div className="container">
+    >
+      <div className="container">
+        <motion.h2
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.3 }}
+          variants={fadeInUp}
+        >
+          {skillData.heading || "Skills"}
+        </motion.h2>
 
-          <motion.div
-            className="skill-hd"
+        {skillData.description && (
+          <motion.p
+            className="skill-desc"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: false, amount: 0.5 }}
-            variants={fadeInVariants}
+            viewport={{ once: false, amount: 0.3 }}
+            variants={fadeInUp}
           >
-            <h1>{skillsData.heading}</h1>
-            <p>{skillsData.description}</p>
-          </motion.div>
+            {skillData.description}
+          </motion.p>
+        )}
 
-
-          <div className="skills-all">
-            {skillsData.skillsCnt?.map((skill, i) => (
-              <motion.div
-                key={i}
-                className="skill-item"
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ amount: 0.5, once: false }}
-                variants={cardVariants}
-              >
-                {skill.icon && (
-                  <span className="skill-img">
-                    <img src={skill.icon} alt={skill.title} />
-                    <p className="range-skill">{skill.range}</p>
-                  </span>
-                )}
-                <b>{skill.title}</b>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
+        <motion.div
+          className="skill-grid"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.2 }}
+          variants={fadeInUp}
+        >
+          {skillData.skills?.map((skill, i) => (
+            <TiltCard key={i} className="skill-item">
+              {skill.icon && <img src={skill.icon} alt={skill.title || skill.name} />}
+              <strong>{skill.title || skill.name}</strong>
+            </TiltCard>
+          ))}
+        </motion.div>
+      </div>
+    </motion.section>
   );
 }

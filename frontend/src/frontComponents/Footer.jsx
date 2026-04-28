@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { getFooter } from '../api/axios';
+import React, { useEffect, useState } from "react";
+import { getFooter } from "../api/axios";
 
 export default function Footer() {
-  const [footer, setFooter] = useState('');
+  const [footer, setFooter] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');  
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function fetchFooter() {
@@ -12,7 +12,7 @@ export default function Footer() {
       try {
         const data = await getFooter();
         if (data) {
-          setFooter(data.copyright || ""); 
+          setFooter(data.copyright || "");
         } else {
           setError("Footer section not found.");
         }
@@ -33,7 +33,7 @@ export default function Footer() {
         ) : error ? (
           <p style={{ color: "red" }}>{error}</p>
         ) : (
-          <p>{footer || '© 2025 Roselin. All rights reserved.'}</p>
+          <p>{footer || "© 2025 Roselin. All rights reserved."}</p>
         )}
       </div>
     </footer>
