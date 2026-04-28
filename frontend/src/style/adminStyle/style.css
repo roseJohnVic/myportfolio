@@ -1,0 +1,117 @@
+.Abt-admin {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.AboutAdmin {
+  padding: 2rem;
+  background-color: #1f2937;
+  color: white;
+}
+
+.Abt-admin {
+  padding: 100px 0;
+}
+.Abt-admin h2 {
+  font-size: 25px;
+  margin-bottom: 20px;
+}
+.Abt-admin form div {
+  margin-bottom: 20px;
+}
+.Abt-admin form div label {
+  font-size: 14px;
+  display: block;
+  padding-bottom: 10px;
+}
+.Abt-admin form div input, .Abt-admin form div textarea {
+  padding: 12px 10px;
+  margin-right: 10px;
+}
+.Abt-admin form img {
+  width: 30px;
+  height: 30px;
+}
+
+.del-tos {
+  background: "#fff";
+  padding: "15px";
+  border-radius: "8px";
+  box-shadow: "0 2px 8px rgba(0,0,0,0.2)";
+  min-width: "250px";
+}
+.del-tos p {
+  color: #000;
+}
+.del-tos button.nope {
+  background-color: yellowgreen;
+  padding: 10px;
+  border-radius: 5px;
+}
+.del-tos button.yep {
+  background-color: red;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.admin-hero {
+  padding: 100px 0;
+}
+.admin-hero form img {
+  width: 200px;
+  height: 200px;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+.admin-hero form button {
+  background: #000;
+  padding: 10px;
+  margin: 15px;
+}
+
+.proj-admin {
+  padding: 100px 0;
+}
+.proj-admin form label {
+  margin-bottom: 20px;
+}
+.proj-admin form label input {
+  padding: 12px;
+  margin-right: 20px;
+}
+.proj-admin form button {
+  margin-top: 20px;
+  background-color: #1f2937;
+  padding: 20px;
+}
+.proj-admin ul {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.proj-admin ul li {
+  width: 300px;
+  position: relative;
+}
+.proj-admin ul li img {
+  width: 300px;
+  height: 300px;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+.proj-admin ul li .del-btn {
+  position: absolute;
+  background-color: red;
+  padding: 10px;
+  right: 20px;
+  top: 10px;
+  cursor: pointer;
+}
+.proj-admin ul li .edt-btn {
+  position: absolute;
+  background-color: #1f2937;
+  padding: 10px;
+  left: 20px;
+  top: 10px;
+  cursor: pointer;
+}/*# sourceMappingURL=style.css.map */
