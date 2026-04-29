@@ -78,7 +78,7 @@ export default function UserContact() {
         viewport={{ once: false, amount: 0.3 }}
         variants={fadeInVariant}
       >
-        <div className="container">
+
           <h5>Contact</h5>
           <form onSubmit={handleSubmit}>
             <div className="dbl">
@@ -119,7 +119,7 @@ export default function UserContact() {
               Send
             </button>
           </form>
-        </div>
+ 
       </motion.div>
       <ToastContainer
         position="top-center"
