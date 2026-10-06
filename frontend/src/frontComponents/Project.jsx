@@ -75,7 +75,7 @@ export default function UserProjects() {
 
 /* ===== UPGRADED VERSION — same data + slider, +3D tilt on cards ===== */
 
-function TiltProjectItem({ proj }) {
+function TiltProjectItem({ proj, url }) {
   const ref = useRef(null);
   const onMove = (e) => {
     const el = ref.current;
@@ -93,10 +93,17 @@ function TiltProjectItem({ proj }) {
         "perspective(900px) rotateX(0) rotateY(0) translateY(0)";
   };
   return (
-    <div className="project-item" ref={ref} onMouseMove={onMove} onMouseLeave={onLeave}>
-      <img src={proj.image} alt={proj.title} />
-      <strong>{proj.title}</strong>
-    </div>
+<div
+  className="project-item"
+  ref={ref}
+  onMouseMove={onMove}
+  onMouseLeave={onLeave}
+  onClick={() => window.open(url, "_blank")}
+  style={{ cursor: "pointer" }}
+>
+  <img src={proj.image} alt={proj.title} />
+  <strong>{proj.title}</strong>
+</div>
   );
 }
 
@@ -149,6 +156,12 @@ export default function UserProjects() {
     visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeOut" } },
   };
 
+  const projectLinks = [
+    "https://dutchgameshop.nl/",
+    "https://coinbuyz.in/",
+    "https://snappshot.nl/",
+  ];
+
   return (
     <section className="project-sec">
       <div className="container">
@@ -169,7 +182,11 @@ export default function UserProjects() {
         >
           <Slider {...settings} className="proj-slider">
             {projectData.projects?.map((proj, idx) => (
-              <TiltProjectItem proj={proj} key={idx} />
+              <TiltProjectItem
+                key={idx}
+                proj={proj}
+                url={projectLinks[idx]}
+              />
             ))}
           </Slider>
         </motion.div>
