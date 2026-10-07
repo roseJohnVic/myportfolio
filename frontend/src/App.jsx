@@ -14,7 +14,7 @@ import CursorEffect from "./frontComponents/CursorEffect";
 function App() {
   return (
     <>
-      <CursorEffect type="specs" />
+      {/* <CursorEffect type="specs" /> */}
 
       <Header
         logo="Roselin"

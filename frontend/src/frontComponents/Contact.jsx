@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function UserContact() {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -41,17 +42,31 @@ export default function UserContact() {
     return true;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-    try {
-      await saveUsers(formData);
-      toast.success("Message saved successfully!");
-      setFormData({ name: "", phone: "", email: "", address: "", message: "" });
-    } catch {
-      toast.error("Error saving contact");
-    }
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!validateForm()) return;
+
+  setLoading(true);
+
+  try {
+    await saveUsers(formData);
+
+    toast.success("Message saved successfully!");
+
+    setFormData({
+      name: "",
+      phone: "",
+      email: "",
+      address: "",
+      message: "",
+    });
+  } catch (error) {
+    toast.error("Error saving contact");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const fadeInVariant = {
     hidden: { opacity: 0, y: 60 },
@@ -115,9 +130,13 @@ export default function UserContact() {
               value={formData.message}
               onChange={handleChange}
             />
-            <button type="submit" className="port-btn">
-              Send
-            </button>
+        <button
+  type="submit"
+  className="port-btn"
+  disabled={loading}
+>
+  {loading ? "Please wait..." : "Submit"}
+</button>
           </form>
  
       </motion.div>
