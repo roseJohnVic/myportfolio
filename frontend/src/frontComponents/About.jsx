@@ -169,7 +169,7 @@ export default function UserAbout() {
     fetchAbout();
   }, []);
 
-  if (loading) return <p>Loading about section...</p>;
+  if (loading) return <p style={{color : 'transparent'}}>Loading about section...</p>;
   if (error) return <p>{error}</p>;
   if (!about) return null;
 

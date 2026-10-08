@@ -47,7 +47,7 @@ export default function UserSkills() {
     fetchSkills();
   }, []);
 
-  if (loading) return <p>Loading skills...</p>;
+  if (loading) return <p style={{color : 'transparent'}}>Loading skills...</p>;
   if (error) return <p>{error}</p>;
   if (!skillData) return null;
 

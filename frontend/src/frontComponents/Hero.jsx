@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { getHero } from "../api/axios";
+import { Link } from "react-router-dom";
 
 export default function UserHero() {
   const [hero, setHero] = useState(null);
@@ -68,12 +69,13 @@ export default function UserHero() {
           <motion.p variants={fadeUp}>{hero.description}</motion.p>
 
           <motion.div className="hero-cta" variants={fadeUp}>
-            <a href="#projects" className="btn-primary">
+            <Link to="/projects" className="btn-primary">
               <span>🚀</span> View My Work
-            </a>
-            <a href="#contact" className="btn-ghost">
+            </Link>
+
+            <Link to="/contact" className="btn-ghost">
               <span>✉</span> Get In Touch
-            </a>
+            </Link>
           </motion.div>
 
           <motion.div className="hero-socials" variants={fadeUp}>

@@ -127,7 +127,7 @@ export default function UserProjects() {
     fetchProject();
   }, []);
 
-  if (loading) return <p>Loading projects...</p>;
+  if (loading) return <p style={{color : 'transparent'}}>Loading projects...</p>;
   if (error) return <p>{error}</p>;
   if (!projectData) return null;
 
